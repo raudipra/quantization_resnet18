@@ -1,0 +1,8 @@
+resnet18的简单实现
+1.train_model.py 训练原始网络
+2.c_model.py 量化感知训练网络
+3.q_model.py 模型量化
+4.validate.py 验证模型精度
+
+量化模型大小变化 42.7M -> 10.7M
+量化精度变化 0.947 -> 0.948
