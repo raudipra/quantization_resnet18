@@ -4,4 +4,3 @@ checkpoint
 checkpoint__
 cifar-10-python.tar.gz
 cifar-10-batches-py
-o_resnet18.py
