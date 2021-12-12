@@ -132,8 +132,8 @@ if __name__ == '__main__':
     SAVE = True
     SAVE_FOLDER = 'quantization_aware_training'
 
-    model = CResnet18(10, pretrained='checkpoint/origin_training/resnet18_w.pt')
-    # model = CResnet18(10, pretrained=True)
+    # model = CResnet18(10, pretrained='checkpoint/origin_training/resnet18_w.pt')
+    model = CResnet18(10, pretrained=True)
 
     # with open('checkpoint/quantization_aware/c_resnet18_w.pt','rb') as f:
     #     state_dict = torch.load(f)
