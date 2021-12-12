@@ -133,18 +133,18 @@ class CBigBlock(nn.Module):
         state_dict_names1 = [layer_name + '.' + name for name in
                              ['conv1.weight', "", 'bn1.weight', 'bn1.bias', 'bn1.running_mean', 'bn1.running_var',
                               'bn1.num_batches_tracked']]
-        self.conv1 = CConvBNReLU2d(inplanes, midplanes, (1, 1), stride, bias=False, dilation=1, affine=True,
-                                   relu=True, q_num_bit=q_num_bit, state_dict_names=state_dict_names1)
+        self.conv1 = CConvBNReLU2d(inplanes, midplanes, (1, 1), stride, q_num_bit=q_num_bit, bias=False, dilation=1, affine=True,
+                                   relu=True, state_dict_names=state_dict_names1)
         state_dict_names2 = [layer_name + '.' + name for name in
                              ['conv2.weight', "", 'bn2.weight', 'bn2.bias', 'bn2.running_mean', 'bn2.running_var',
                               'bn2.num_batches_tracked']]
-        self.conv2 = CConvBNReLU2d(midplanes, midplanes, (3, 3), (1, 1), padding=1, bias=False, dilation=1, affine=True,
-                                   relu=True, q_num_bit=q_num_bit, state_dict_names=state_dict_names2)
+        self.conv2 = CConvBNReLU2d(midplanes, midplanes, (3, 3), (1, 1), q_num_bit=q_num_bit, padding=1, bias=False, dilation=1, affine=True,
+                                   relu=True, state_dict_names=state_dict_names2)
         state_dict_names3 = [layer_name + '.' + name for name in
                              ['conv3.weight', "", 'bn3.weight', 'bn3.bias', 'bn3.running_mean', 'bn3.running_var',
                               'bn3.num_batches_tracked']]
-        self.conv3 = CConvBNReLU2d(midplanes, outplanes, (1, 1), (1, 1), bias=False, dilation=1, affine=True,
-                                   relu=False, q_num_bit=q_num_bit, state_dict_names=state_dict_names3)
+        self.conv3 = CConvBNReLU2d(midplanes, outplanes, (1, 1), (1, 1), q_num_bit=q_num_bit, bias=False, dilation=1, affine=True,
+                                   relu=False, state_dict_names=state_dict_names3)
         self.act2 = nn.ReLU(inplace=True)
         self.stride = stride
         if downsample_shortcut:
@@ -191,8 +191,8 @@ class CResnet50(nn.Module):
         super(CResnet50, self).__init__()
         state_dict_names = ['conv1.weight', "", 'bn1.weight', 'bn1.bias', 'bn1.running_mean', 'bn1.running_var',
                             'bn1.num_batches_tracked']
-        self.conv1 = CConvBNReLU2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=3, bias=False, start=True,
-                                   affine=True, relu=True, q_num_bit=q_num_bit, state_dict_names=state_dict_names)
+        self.conv1 = CConvBNReLU2d(3, 64, kernel_size=(7, 7), stride=(2, 2), q_num_bit=q_num_bit, padding=3, bias=False, start=True,
+                                   affine=True, relu=True, state_dict_names=state_dict_names)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
 
