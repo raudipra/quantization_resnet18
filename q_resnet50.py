@@ -7,7 +7,7 @@ from c_layers import QParam
 
 
 class QBigBlock(nn.Module):
-    def __init__(self, inplanes, midplanes, outplanes, downsample=False):
+    def __init__(self, inplanes, midplanes, outplanes, downsample=False, downsample_shortcut=False):
         super(QBigBlock, self).__init__()
         self.inplanes = inplanes
         self.outplanes = outplanes
@@ -18,7 +18,7 @@ class QBigBlock(nn.Module):
         self.conv3 = QConvBnReLU(midplanes, outplanes, (1, 1), relu=False, stride=(1, 1), padding=0, dilation=1)
         self.act2 = QReLU()
         self.stride = stride
-        if downsample:
+        if downsample_shortcut:
             self.downsample = QConvBnReLU(inplanes, outplanes, kernel_size=(1, 1), stride=(2, 2), relu=False)
         else:
             self.downsample = None
@@ -65,20 +65,20 @@ class QResnet50(nn.Module):
         self.conv1 = QConvBnReLU(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=3, relu=True)
         self.maxpool = QMaxPool2d(kernel_size=3, stride=2, padding=1)
 
-        self.layer1 = nn.Sequential(QBigBlock(64, 64, 256)
+        self.layer1 = nn.Sequential(QBigBlock(64, 64, 256, downsample_shortcut=True)
                                     QBigBlock(256, 64, 256)
                                     QBigBlock(256, 64, 256))
-        self.layer2 = nn.Sequential(QBigBlock(256, 128, 512, downsample=True)
+        self.layer2 = nn.Sequential(QBigBlock(256, 128, 512, downsample=True, downsample_shortcut=True)
                                     QBigBlock(512, 128, 512)
                                     QBigBlock(512, 128, 512)
                                     QBigBlock(512, 128, 512))
-        self.layer3 = nn.Sequential(QBigBlock(512, 256, 1024, downsample=True)
+        self.layer3 = nn.Sequential(QBigBlock(512, 256, 1024, downsample=True, downsample_shortcut=True)
                                     QBigBlock(1024, 256, 1024)
                                     QBigBlock(1024, 256, 1024)
                                     QBigBlock(1024, 256, 1024)
                                     QBigBlock(1024, 256, 1024)
                                     QBigBlock(1024, 256, 1024))
-        self.layer4 = nn.Sequential(QBigBlock(1024, 512, 2048, downsample=True)
+        self.layer4 = nn.Sequential(QBigBlock(1024, 512, 2048, downsample=True, downsample_shortcut=True)
                                     QBigBlock(2048, 512, 2048)
                                     QBigBlock(2048, 512, 2048))
 
