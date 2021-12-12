@@ -73,8 +73,8 @@ def fold_bn(conv_w, conv_b, mean, var, gamma, beta, eps=1e-5):
 
 
 class CConvBNReLU2d(nn.Module):
-    def __init__(self, in_channel, out_channel, kernel_size, stride=1, padding=0, bias=False, dilation=1
-                 , q_num_bit=8, start=False, affine=True, relu=False, state_dict_names=[]):
+    def __init__(self, in_channel, out_channel, kernel_size, q_num_bit, stride=1, padding=0, bias=False, dilation=1
+                 , start=False, affine=True, relu=False, state_dict_names=[]):
         super(CConvBNReLU2d, self).__init__()
 
         if type(kernel_size) == int:
@@ -154,7 +154,7 @@ class CConvBNReLU2d(nn.Module):
 
 
 class CLinear(nn.Module):
-    def __init__(self, in_features, out_features, bias=True, q_num_bit=8, pretrained_name=""):
+    def __init__(self, in_features, out_features, q_num_bit, bias=True, pretrained_name=""):
         super(CLinear, self).__init__()
         self.weight = nn.Parameter(torch.randn(out_features, in_features), requires_grad=True)
         self.bias = nn.Parameter(torch.randn(out_features), requires_grad=True) if bias else None
@@ -205,7 +205,7 @@ class CLinear(nn.Module):
 
 
 class CAdd(nn.Module):
-    def __init__(self, q_num_bit=8):
+    def __init__(self, q_num_bit):
         super(CAdd, self).__init__()
         self.q_out = QParam(q_num_bit)
         self.if_quantize_forward = False
