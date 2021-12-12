@@ -5,7 +5,7 @@ from c_layers import CConvBNReLU2d, CLinear, CAdd
 
 
 class CBasicBlock(nn.Module):
-    def __init__(self, inplanes, outplanes, layer_name=""):
+    def __init__(self, inplanes, outplanes, q_num_bit=8, layer_name=""):
         super(CBasicBlock, self).__init__()
         self.inplanes = inplanes
         self.outplanes = outplanes
@@ -16,12 +16,12 @@ class CBasicBlock(nn.Module):
         state_dict_names1 = [layer_name + '.' + name for name in
                              ['conv1.weight', "", 'bn1.weight', 'bn1.bias', 'bn1.running_mean', 'bn1.running_var',
                               'bn1.num_batches_tracked']]
-        self.conv1 = CConvBNReLU2d(inplanes, outplanes, (3, 3), stride, padding=1, bias=False, dilation=1, affine=True,
+        self.conv1 = CConvBNReLU2d(inplanes, outplanes, (3, 3), q_num_bit=q_num_bit, stride=stride, padding=1, bias=False, dilation=1, affine=True,
                                    relu=True, state_dict_names=state_dict_names1)
         state_dict_names2 = [layer_name + '.' + name for name in
                              ['conv2.weight', "", 'bn2.weight', 'bn2.bias', 'bn2.running_mean', 'bn2.running_var',
                               'bn2.num_batches_tracked']]
-        self.conv2 = CConvBNReLU2d(outplanes, outplanes, (3, 3), (1, 1), padding=1, bias=False, dilation=1, affine=True,
+        self.conv2 = CConvBNReLU2d(outplanes, outplanes, (3, 3), q_num_bit=q_num_bit, stride=(1, 1), padding=1, bias=False, dilation=1, affine=True,
                                    relu=False, state_dict_names=state_dict_names2)
         self.act2 = nn.ReLU(inplace=True)
         self.stride = stride
@@ -30,11 +30,11 @@ class CBasicBlock(nn.Module):
                                   ['downsample.0.weight', "", 'downsample.1.weight', 'downsample.1.bias',
                                    'downsample.1.running_mean', 'downsample.1.running_var',
                                    'downsample.1.num_batches_tracked']]
-            self.downsample = CConvBNReLU2d(inplanes, outplanes, kernel_size=(1, 1), stride=(2, 2), bias=False,
+            self.downsample = CConvBNReLU2d(inplanes, outplanes, kernel_size=(1, 1), q_num_bit=q_num_bit, stride=(2, 2), bias=False,
                                             affine=True, relu=False, state_dict_names=state_dict_names_d)
         else:
             self.downsample = None
-        self.add = CAdd()
+        self.add = CAdd(q_num_bit=q_num_bit)
         self.act2 = nn.ReLU()
 
     def load_pretrained(self, state_dict):
@@ -62,11 +62,11 @@ class CBasicBlock(nn.Module):
 
 
 class CResnet18(nn.Module):
-    def __init__(self, num_class, pretrained=True):
+    def __init__(self, num_class, q_num_bit=8, pretrained=True):
         super(CResnet18, self).__init__()
         state_dict_names = ['conv1.weight', "", 'bn1.weight', 'bn1.bias', 'bn1.running_mean', 'bn1.running_var',
                             'bn1.num_batches_tracked']
-        self.conv1 = CConvBNReLU2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=3, bias=False, start=True,
+        self.conv1 = CConvBNReLU2d(3, 64, kernel_size=(7, 7), q_num_bit=q_num_bit, stride=(2, 2), padding=3, bias=False, start=True,
                                    affine=True, relu=True, state_dict_names=state_dict_names)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
@@ -81,7 +81,7 @@ class CResnet18(nn.Module):
 
         self.global_pool = nn.AdaptiveAvgPool2d(1)
         self.flatten = nn.Flatten()
-        self.fc = CLinear(512, num_class)
+        self.fc = CLinear(512, num_class, q_num_bit=q_num_bit)
         if pretrained:
             if pretrained is True:
                 import timm
@@ -133,17 +133,17 @@ class CBigBlock(nn.Module):
         state_dict_names1 = [layer_name + '.' + name for name in
                              ['conv1.weight', "", 'bn1.weight', 'bn1.bias', 'bn1.running_mean', 'bn1.running_var',
                               'bn1.num_batches_tracked']]
-        self.conv1 = CConvBNReLU2d(inplanes, midplanes, (1, 1), stride, q_num_bit=q_num_bit, bias=False, dilation=1, affine=True,
+        self.conv1 = CConvBNReLU2d(inplanes, midplanes, (1, 1), q_num_bit=q_num_bit, stride=stride, bias=False, dilation=1, affine=True,
                                    relu=True, state_dict_names=state_dict_names1)
         state_dict_names2 = [layer_name + '.' + name for name in
                              ['conv2.weight', "", 'bn2.weight', 'bn2.bias', 'bn2.running_mean', 'bn2.running_var',
                               'bn2.num_batches_tracked']]
-        self.conv2 = CConvBNReLU2d(midplanes, midplanes, (3, 3), (1, 1), q_num_bit=q_num_bit, padding=1, bias=False, dilation=1, affine=True,
+        self.conv2 = CConvBNReLU2d(midplanes, midplanes, (3, 3), q_num_bit=q_num_bit, stride=(1, 1), padding=1, bias=False, dilation=1, affine=True,
                                    relu=True, state_dict_names=state_dict_names2)
         state_dict_names3 = [layer_name + '.' + name for name in
                              ['conv3.weight', "", 'bn3.weight', 'bn3.bias', 'bn3.running_mean', 'bn3.running_var',
                               'bn3.num_batches_tracked']]
-        self.conv3 = CConvBNReLU2d(midplanes, outplanes, (1, 1), (1, 1), q_num_bit=q_num_bit, bias=False, dilation=1, affine=True,
+        self.conv3 = CConvBNReLU2d(midplanes, outplanes, (1, 1), q_num_bit=q_num_bit, stride=(1, 1), bias=False, dilation=1, affine=True,
                                    relu=False, state_dict_names=state_dict_names3)
         self.act2 = nn.ReLU(inplace=True)
         self.stride = stride
@@ -152,8 +152,8 @@ class CBigBlock(nn.Module):
                                   ['downsample.0.weight', "", 'downsample.1.weight', 'downsample.1.bias',
                                    'downsample.1.running_mean', 'downsample.1.running_var',
                                    'downsample.1.num_batches_tracked']]
-            self.downsample = CConvBNReLU2d(inplanes, outplanes, kernel_size=(1, 1), stride=stride, bias=False,
-                                            affine=True, relu=False, q_num_bit=q_num_bit, state_dict_names=state_dict_names_d)
+            self.downsample = CConvBNReLU2d(inplanes, outplanes, kernel_size=(1, 1), q_num_bit=q_num_bit, stride=stride, bias=False,
+                                            affine=True, relu=False, state_dict_names=state_dict_names_d)
         else:
             self.downsample = None
         self.add = CAdd(q_num_bit=q_num_bit)
@@ -191,7 +191,7 @@ class CResnet50(nn.Module):
         super(CResnet50, self).__init__()
         state_dict_names = ['conv1.weight', "", 'bn1.weight', 'bn1.bias', 'bn1.running_mean', 'bn1.running_var',
                             'bn1.num_batches_tracked']
-        self.conv1 = CConvBNReLU2d(3, 64, kernel_size=(7, 7), stride=(2, 2), q_num_bit=q_num_bit, padding=3, bias=False, start=True,
+        self.conv1 = CConvBNReLU2d(3, 64, kernel_size=(7, 7), q_num_bit=q_num_bit, stride=(2, 2), padding=3, bias=False, start=True,
                                    affine=True, relu=True, state_dict_names=state_dict_names)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
