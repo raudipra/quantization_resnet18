@@ -1,5 +1,6 @@
 from data import train_dl, val_dl
-from o_resnet18 import Resnet18_
+from o_resnet18 import Resnet18_, Resnet50_
+import torchvision.models as models
 import torch
 import torch.nn as nn
 import tqdm
@@ -10,7 +11,9 @@ SAVE = True
 
 if __name__ == '__main__':
 
-    model = Resnet18_(10, pretrained=True)
+    model = Resnet50_(10, pretrained=True)
+    # Here the size of each output sample is set to 2.
+    # Alternatively, it can be generalized to nn.Linear(num_ftrs, len(class_names)).
     model = model.cuda()
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), 1e-3, momentum=0.9, weight_decay=1e-5)
@@ -53,7 +56,7 @@ if __name__ == '__main__':
             min_loss = val_loss
             if SAVE:
                 os.makedirs('checkpoint/origin_training', exist_ok=True)
-                with open('checkpoint/origin_training/resnet18_w.pt', 'wb') as f:
+                with open('checkpoint/origin_training/resnet50_w.pt', 'wb') as f:
                     torch.save(model.state_dict(), f)
                 with open('checkpoint/origin_training/simple_log.txt', 'w') as f:
                     f.write(f'epoch:{epoch}\n'
