@@ -35,7 +35,7 @@ class CBigBlock(nn.Module):
                                   ['downsample.0.weight', "", 'downsample.1.weight', 'downsample.1.bias',
                                    'downsample.1.running_mean', 'downsample.1.running_var',
                                    'downsample.1.num_batches_tracked']]
-            self.downsample = CConvBNReLU2d(inplanes, outplanes, kernel_size=(1, 1), stride=(2, 2), bias=False,
+            self.downsample = CConvBNReLU2d(inplanes, outplanes, kernel_size=(1, 1), stride=stride, bias=False,
                                             affine=True, relu=False, state_dict_names=state_dict_names_d)
         else:
             self.downsample = None
@@ -56,8 +56,6 @@ class CBigBlock(nn.Module):
         x = self.conv3(x)
         if self.downsample:
             shortcut = self.downsample(shortcut)
-            print(shortcut.size())
-        print(x.size(), shortcut.size())
         x = self.add(x, shortcut)
         x = self.act2(x)
         return x

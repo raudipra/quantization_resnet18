@@ -19,7 +19,7 @@ class QBigBlock(nn.Module):
         self.act2 = QReLU()
         self.stride = stride
         if downsample_shortcut:
-            self.downsample = QConvBnReLU(inplanes, outplanes, kernel_size=(1, 1), stride=(2, 2), relu=False)
+            self.downsample = QConvBnReLU(inplanes, outplanes, kernel_size=(1, 1), stride=stride, relu=False)
         else:
             self.downsample = None
         self.add = QAdd()
