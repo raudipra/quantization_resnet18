@@ -71,7 +71,7 @@ class CBigBlock(nn.Module):
 
 class CResnet50(nn.Module):
     def __init__(self, num_class, pretrained=True):
-        super(CResnet18, self).__init__()
+        super(CResnet50, self).__init__()
         state_dict_names = ['conv1.weight', "", 'bn1.weight', 'bn1.bias', 'bn1.running_mean', 'bn1.running_var',
                             'bn1.num_batches_tracked']
         self.conv1 = CConvBNReLU2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=3, bias=False, start=True,
@@ -102,7 +102,7 @@ class CResnet50(nn.Module):
         if pretrained:
             if pretrained is True:
                 import timm
-                state_dict = timm.create_model('resnet18', pretrained=True).state_dict()
+                state_dict = timm.create_model('resnet50', pretrained=True).state_dict()
             else:
                 with open(pretrained, 'rb') as f:
                     state_dict = torch.load(f)
@@ -152,11 +152,11 @@ if __name__ == '__main__':
     # model = CResnet50(10, pretrained='checkpoint/origin_training/resnet50_w.pt')
     model = CResnet50(10, pretrained=True)
 
-    # with open('checkpoint/quantization_aware/c_resnet18_w.pt','rb') as f:
+    # with open('checkpoint/quantization_aware/c_resnet50_w.pt','rb') as f:
     #     state_dict = torch.load(f)
     # model.load_state_dict(state_dict)
 
-    # model = timm.create_model('resnet18',pretrained=True)
+    # model = timm.create_model('resnet50',pretrained=True)
     # model.fc = nn.Linear(512,10)
 
     model.quantize(True)
@@ -202,7 +202,7 @@ if __name__ == '__main__':
             min_loss = val_loss
             if SAVE:
                 os.makedirs(f'checkpoint/{SAVE_FOLDER}', exist_ok=True)
-                with open(f'checkpoint/{SAVE_FOLDER}/c_resnet18_w.pt', 'wb') as f:
+                with open(f'checkpoint/{SAVE_FOLDER}/c_resnet50_w.pt', 'wb') as f:
                     torch.save(model.state_dict(), f)
                 with open(f'checkpoint/{SAVE_FOLDER}/simple_log.txt', 'w') as f:
                     f.write(f'epoch:{epoch}\n'
