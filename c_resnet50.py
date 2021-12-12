@@ -98,7 +98,7 @@ class CResnet50(nn.Module):
 
         self.global_pool = nn.AdaptiveAvgPool2d(1)
         self.flatten = nn.Flatten()
-        self.fc = CLinear(512, num_class)
+        self.fc = CLinear(2048, num_class)
         if pretrained:
             if pretrained is True:
                 import timm

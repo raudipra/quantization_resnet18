@@ -85,7 +85,7 @@ class QResnet50(nn.Module):
         self.global_pool = QAdaptiveAvgPool2d(1)
         self.flatten = nn.Flatten()
 
-        self.fc = QLinear(512, num_class)
+        self.fc = QLinear(2048, num_class)
         self.q_in = QParam(8)
         self.q_out = QParam(8)
 
