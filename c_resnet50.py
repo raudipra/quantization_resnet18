@@ -6,7 +6,7 @@ from c_layers import CConvBNReLU2d, CLinear, CAdd
 
 class CBigBlock(nn.Module):
     def __init__(self, inplanes, midplanes, outplanes, downsample=False, layer_name=""):
-        super(CBasicBlock, self).__init__()
+        super(CBigBlock, self).__init__()
         self.inplanes = inplanes
         self.midplanes = midplanes
         self.outplanes = outplanes
@@ -16,7 +16,7 @@ class CBigBlock(nn.Module):
         state_dict_names1 = [layer_name + '.' + name for name in
                              ['conv1.weight', "", 'bn1.weight', 'bn1.bias', 'bn1.running_mean', 'bn1.running_var',
                               'bn1.num_batches_tracked']]
-        self.conv1 = CConvBNReLU2d(inplanes, midplanes, (1, 1), stride, padding=1, bias=False, dilation=1, affine=True,
+        self.conv1 = CConvBNReLU2d(inplanes, midplanes, (1, 1), stride, padding=0, bias=False, dilation=1, affine=True,
                                    relu=True, state_dict_names=state_dict_names1)
         state_dict_names2 = [layer_name + '.' + name for name in
                              ['conv2.weight', "", 'bn2.weight', 'bn2.bias', 'bn2.running_mean', 'bn2.running_var',
@@ -26,7 +26,7 @@ class CBigBlock(nn.Module):
         state_dict_names3 = [layer_name + '.' + name for name in
                              ['conv3.weight', "", 'bn3.weight', 'bn3.bias', 'bn3.running_mean', 'bn3.running_var',
                               'bn3.num_batches_tracked']]
-        self.conv3 = CConvBNReLU2d(midplanes, outplanes, (1, 1), (1, 1), padding=1, bias=False, dilation=1, affine=True,
+        self.conv3 = CConvBNReLU2d(midplanes, outplanes, (1, 1), (1, 1), padding=0, bias=False, dilation=1, affine=True,
                                    relu=False, state_dict_names=state_dict_names2)
         self.act2 = nn.ReLU(inplace=True)
         self.stride = stride
@@ -83,18 +83,18 @@ class CResnet50(nn.Module):
                                     CBigBlock(256, 64, 256, layer_name='layer1.1'),
                                     CBigBlock(256, 64, 256, layer_name='layer1.2'))
         self.layer2 = nn.Sequential(CBigBlock(256, 128, 512, downsample=True, layer_name='layer2.0'),
-                                    CBasicBlock(512, 128, 512, layer_name='layer2.1'),
-                                    CBasicBlock(512, 128, 512, layer_name='layer2.2'),
-                                    CBasicBlock(512, 128, 512, layer_name='layer2.3'))
-        self.layer3 = nn.Sequential(CBasicBlock(512, 256, 1024, downsample=True, layer_name='layer3.0'),
-                                    CBasicBlock(1024, 256, 1024, layer_name='layer3.1'),
-                                    CBasicBlock(1024, 256, 1024, layer_name='layer3.2'),
-                                    CBasicBlock(1024, 256, 1024, layer_name='layer3.3'),
-                                    CBasicBlock(1024, 256, 1024, layer_name='layer3.4'),
-                                    CBasicBlock(1024, 256, 1024, layer_name='layer3.5'))
-        self.layer4 = nn.Sequential(CBasicBlock(1024, 512, 2048, downsample=True, layer_name='layer4.0'),
-                                    CBasicBlock(2048, 512, 2048, layer_name='layer4.1'),
-                                    CBasicBlock(2048, 512, 2048, layer_name='layer4.2'))
+                                    CBigBlock(512, 128, 512, layer_name='layer2.1'),
+                                    CBigBlock(512, 128, 512, layer_name='layer2.2'),
+                                    CBigBlock(512, 128, 512, layer_name='layer2.3'))
+        self.layer3 = nn.Sequential(CBigBlock(512, 256, 1024, downsample=True, layer_name='layer3.0'),
+                                    CBigBlock(1024, 256, 1024, layer_name='layer3.1'),
+                                    CBigBlock(1024, 256, 1024, layer_name='layer3.2'),
+                                    CBigBlock(1024, 256, 1024, layer_name='layer3.3'),
+                                    CBigBlock(1024, 256, 1024, layer_name='layer3.4'),
+                                    CBigBlock(1024, 256, 1024, layer_name='layer3.5'))
+        self.layer4 = nn.Sequential(CBigBlock(1024, 512, 2048, downsample=True, layer_name='layer4.0'),
+                                    CBigBlock(2048, 512, 2048, layer_name='layer4.1'),
+                                    CBigBlock(2048, 512, 2048, layer_name='layer4.2'))
 
         self.global_pool = nn.AdaptiveAvgPool2d(1)
         self.flatten = nn.Flatten()
