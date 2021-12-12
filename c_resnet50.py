@@ -56,6 +56,8 @@ class CBigBlock(nn.Module):
         x = self.conv3(x)
         if self.downsample:
             shortcut = self.downsample(shortcut)
+            print(shortcut.size())
+        print(x.size(), shortcut.size())
         x = self.add(x, shortcut)
         x = self.act2(x)
         return x
