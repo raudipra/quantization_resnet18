@@ -22,7 +22,7 @@ class CBigBlock(nn.Module):
                              ['conv2.weight', "", 'bn2.weight', 'bn2.bias', 'bn2.running_mean', 'bn2.running_var',
                               'bn2.num_batches_tracked']]
         self.conv2 = CConvBNReLU2d(midplanes, midplanes, (3, 3), (1, 1), padding=1, bias=False, dilation=1, affine=True,
-                                   relu=False, state_dict_names=state_dict_names2)
+                                   relu=True, state_dict_names=state_dict_names2)
         state_dict_names3 = [layer_name + '.' + name for name in
                              ['conv3.weight', "", 'bn3.weight', 'bn3.bias', 'bn3.running_mean', 'bn3.running_var',
                               'bn3.num_batches_tracked']]
